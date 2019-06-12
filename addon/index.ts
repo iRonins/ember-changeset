@@ -209,17 +209,18 @@ export function changeset(
       if (get(this, 'isValid') && get(this, 'isDirty')) {
         let content: Content = get(this, CONTENT);
         let changes: Changes = get(this, CHANGES);
+
         keys(changes).forEach((key) => {
           if (key.indexOf('objectAt') > -1) {
             const keys: Array = key.split(/\.objectAt\(\d\)\./);
             const positions: Array = key.match(/objectAt\(\d\)/g)
               .map(objPosition => parseInt(objPosition.match(/\d/)[0]));
 
-            let topContent = content;
-            for (let i = 0; i < positions.length; i++) {
+            let topContent = content.get(keys[0]).objectAt(positions[0]);
+            for (let i = 1; i < (positions.length - 1); i++) {
               topContent = topContent.get(keys[i]).objectAt(positions[i]);
             }
-            deepSet(topContent, keys[keys.length - 1], changes[key].value);
+            set(topContent, keys[keys.length - 1], changes[key].value);
           } else {
             deepSet(content, key, changes[key].value);
           }
